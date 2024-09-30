@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-operator
+  template:
+    metadata:
+      labels:
+        app: my-operator
+    spec:
+      serviceAccountName: my-operator-sa # Use a service account with appropriate permissions
+      containers:
+      - name: my-operator
+        image: kumarharshit/operator:latest # Replace with your Docker image
+        env:
+        - name: RUST_LOG
+          value: "info"

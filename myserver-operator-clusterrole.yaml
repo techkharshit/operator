@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: my-operator-role
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
+  - apiGroups: [""]
+    resources: [
+      "services", 
+      "persistentvolumeclaims", 
+      "configmaps", 
+      "pods", 
+      "pods/portforward"   # Permission to forward ports on pods
+    ]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
+  - apiGroups: [""]
+    resources: ["portforward"]   # Ensure this is included to allow port forwarding
+    verbs: ["create"]            # Only 'create' is required to initiate port forwarding
+  - apiGroups: ["example.com"]
+    resources: ["myservers"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]

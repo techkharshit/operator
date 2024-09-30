@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-rust-deployment
+spec:
+  selector:
+    matchLabels:
+      app: rust-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rust-server
+    spec:
+      containers:
+      - name: rust-server
+        image: kumarharshit/rust_new
+        env:
+        - name: MINIO_ENDPOINT
+          value: "http://minio:9000"
+        - name: MINIO_BUCKET
+          value: "test"
+        - name: MINIO_ACCESS_KEY
+          value: "minioadmin"
+        - name: MINIO_SECRET_KEY
+          value: "minioadmin"
+        - name: MYSQL_URL
+          value: "mysql://root:password@mysql:3306/test"
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: downloads-volume
+          mountPath: /usr/src/app/Downloads
+      volumes:
+      - name: downloads-volume
+        hostPath:
+          path: /mnt/data
+          type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rust-server
+spec:
+  type: NodePort  # Use LoadBalancer if deploying in the cloud
+  selector:
+    app: rust-server
+  ports:
+  - name: http         # Added a named port for clarity and compatibility with port-forwarding
+    protocol: TCP
+    port: 8000
+    targetPort: 8000
+    nodePort: 31925    # Specific nodePort for NodePort access (if LoadBalancer isn't available)
